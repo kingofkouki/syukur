@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syukur-cache-v2';
+const CACHE_NAME = 'syukur-cache-v3';
 const urlsToCache = [
   './',
   './index.html',
