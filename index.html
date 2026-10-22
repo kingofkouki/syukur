@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Syukur. - Jurnal Minimalis</title>
+
+<!-- Pengaturan PWA & Full Screen iOS/Android -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<style>
+  /* Palet Warna - Tema Oranye Hangat (Warm Orange iOS) */
+  :root[data-theme="light"] { 
+    color-scheme: light; 
+    --bg: #f2f2f7; 
+    --card: #ffffff; 
+    --ink: #1c1c1e; 
+    --muted: #8e8e93; 
+    --accent: #ff9500; 
+    --accent-soft: rgba(255, 149, 0, 0.15);
+    --line: #e5e5ea;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.1); 
+  }
+  :root { 
+    color-scheme: dark; 
+    --bg: #000000; 
+    --card: #1c1c1e;
+    --ink: #ffffff; 
+    --muted: #8e8e93; 
+    --accent: #ff9f0a; 
+    --accent-soft: rgba(255, 159, 10, 0.2);
+    --line: #38383a;
+    --glass-bg: rgba(28, 28, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.15); 
+  }
+  
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--ink); 
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  
+  .topbar { 
+    display: flex; justify-content: flex-end; 
+    padding: calc(20px + env(safe-area-inset-top)) 20px 20px; 
+    position: relative; z-index: 20;
+  }
+  .theme-toggle { 
+    display: inline-flex; align-items: center; gap: 6px; 
+    background: var(--glass-bg); color: var(--ink); 
+    border: 1px solid var(--glass-border); 
+    border-radius: 20px; padding: 7px 13px; cursor: pointer; 
+    font: inherit; font-size: 0.9rem; font-weight: 600; 
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+
+  .container {
+    flex: 1;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px 20px;
+  }
+
+  header { text-align: center; margin-bottom: 30px; }
+  h1 { font-size: 3.2rem; font-weight: 700; margin: 0 0 5px; letter-spacing: -1.5px; color: var(--accent); }
+  .sub { color: var(--muted); font-size: 1.05rem; margin: 0; font-weight: 500; }
+
+  /* Area Input Jurnal */
+  .compose-area {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 40px;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  }
+  .compose-area label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+  textarea:focus { border-color: var(--accent); }
+  
+  .btn-save {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3);
+    transition: transform 0.2s;
+  }
+  .btn-save:active { transform: scale(0.98); }
+
+  /* Riwayat (Feed) */
+  .feed-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: var(--ink);
+  }
+  
+  .feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .entry-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+  .entry-date {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .entry-text {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0;
+  }
+  .btn-delete {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .btn-delete:active { opacity: 1; }
+
+  .empty-state {
+    text-align: center; color: var(--muted); font-size: 0.95rem; margin-top: 20px;
+  }
+
+  footer { 
+    text-align: center; 
+    padding: 40px 20px calc(24px + env(safe-area-inset-bottom)); 
+    color: var(--muted); font-size: 0.85rem; 
+  }
+  .creator-text { font-weight: 500; color: var(--ink); display: block; opacity: 0.6; margin-top: 6px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="theme-toggle" id="themeBtn" type="button">
+    <span id="themeIcon">☀️</span><span id="themeLabel">Light</span>
+  </button>
+</div>
+
+<div class="container">
+  <header>
+    <h1>Syukur.</h1>
+    <p class="sub">Temukan satu hal baik setiap hari.</p>
+  </header>
+
+  <div class="compose-area">
+    <label for="journalInput">Hari ini saya bersyukur atas...</label>
+    <textarea id="journalInput" rows="3" placeholder="Misal: Secangkir kopi hangat pagi ini, atau cuaca yang cerah..." autocomplete="off"></textarea>
+    <button class="btn-save" id="saveBtn">Simpan Catatan</button>
+  </div>
+
+  <h2 class="feed-title" id="feedTitle" style="display:none;">Riwayat Jurnal</h2>
+  <div class="feed-list" id="feedList">
+    <!-- Riwayat jurnal akan muncul di sini -->
+  </div>
+  <div class="empty-state" id="emptyState">Belum ada catatan. Mulailah bersyukur hari ini.</div>
+  
+</div>
+
+<footer>
+  Setiap tulisan kecil membawa dampak besar.
+  <span class="creator-text">Created by Zaky Wahyudiansah</span>
+</footer>
+
+<script>
+// 1. Pengaturan Tema
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const isDark = theme === "dark";
+  document.getElementById("themeIcon").textContent = isDark ? "☀️" : "🌙";
+  document.getElementById("themeLabel").textContent = isDark ? "Light" : "Dark";
+  try { localStorage.setItem("syukurTheme", theme); } catch(e) {}
+}
+let currentTheme = "dark";
+try { currentTheme = localStorage.getItem("syukurTheme") || "dark"; } catch(e) {}
+applyTheme(currentTheme);
+document.getElementById("themeBtn").addEventListener("click", () => {
+  currentTheme = currentTheme === "dark" ? "light" : "dark";
+  applyTheme(currentTheme);
+});
+
+// 2. Logika Jurnal
+const journalInput = document.getElementById('journalInput');
+const saveBtn = document.getElementById('saveBtn');
+const feedList = document.getElementById('feedList');
+const emptyState = document.getElementById('emptyState');
+const feedTitle = document.getElementById('feedTitle');
+
+let entries = [];
+try {
+  entries = JSON.parse(localStorage.getItem('syukurEntries') || '[]');
+} catch(e) {}
+
+function saveEntries() {
+  try { localStorage.setItem('syukurEntries', JSON.stringify(entries)); } catch(e) {}
+}
+
+function renderEntries() {
+  feedList.innerHTML = '';
+  
+  if (entries.length === 0) {
+    emptyState.style.display = 'block';
+    feedTitle.style.display = 'none';
+  } else {
+    emptyState.style.display = 'none';
+    feedTitle.style.display = 'block';
+  }
+
+  entries.forEach((entry, index) => {
+    const div = document.createElement('div');
+    div.className = 'entry-card';
+    
+    // Teks aman dari input berbahaya
+    const safeText = document.createElement('div');
+    safeText.textContent = entry.text;
+    
+    div.innerHTML = `
+      <span class="entry-date">${entry.date}</span>
+      <p class="entry-text">${safeText.innerHTML}</p>
+      <button class="btn-delete" onclick="deleteEntry(${index})" title="Hapus">✕</button>
+    `;
+    feedList.appendChild(div);
+  });
+}
+
+function addEntry() {
+  const text = journalInput.value.trim();
+  if (text !== '') {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const dateStr = new Date().toLocaleDateString('id-ID', options);
+    
+    // Tambahkan ke paling atas (array index 0)
+    entries.unshift({ id: Date.now(), date: dateStr, text: text });
+    
+    journalInput.value = '';
+    saveEntries();
+    renderEntries();
+    
+    // Animasi perayaan apresiasi diri
+    if (typeof confetti === 'function') {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ff9500', '#ffcc00', '#ffffff'] });
+    }
+  }
+}
+
+window.deleteEntry = function(index) {
+  if(confirm('Hapus catatan ini?')) {
+    entries.splice(index, 1);
+    saveEntries();
+    renderEntries();
+  }
+};
+
+saveBtn.addEventListener('click', addEntry);
+
+// Inisialisasi awal
+renderEntries();
+
+// Registrasi Service Worker PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
