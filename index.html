@@ -2,15 +2,20 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<!-- viewport-fit=cover wajib untuk full screen menembus area poni HP -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Syukur. - Jurnal Minimalis</title>
 
 <!-- Pengaturan PWA & Full Screen iOS/Android -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- Meta tag untuk warna status bar dinamis -->
+<meta name="theme-color" id="metaThemeColor" content="#000000">
+
+<!-- Mengaktifkan mode layar penuh di iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
+<!-- Membuat status bar menyatu dengan warna background di iOS -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <style>
@@ -52,9 +57,10 @@
     transition: background-color 0.4s ease, color 0.4s ease;
   }
   
+  /* Area atas ditambahkan env(safe-area-inset-top) agar aman dari poni HP */
   .topbar { 
     display: flex; justify-content: flex-end; 
-    padding: calc(20px + env(safe-area-inset-top)) 20px 20px; 
+    padding: calc(16px + env(safe-area-inset-top)) 20px 20px; 
     position: relative; z-index: 20;
   }
   .theme-toggle { 
@@ -184,6 +190,7 @@
     text-align: center; color: var(--muted); font-size: 0.95rem; margin-top: 20px;
   }
 
+  /* Area bawah ditambahkan env(safe-area-inset-bottom) */
   footer { 
     text-align: center; 
     padding: 40px 20px calc(24px + env(safe-area-inset-bottom)); 
@@ -227,17 +234,23 @@
 </footer>
 
 <script>
-// 1. Pengaturan Tema
+// 1. Pengaturan Tema & Warna Status Bar Dinamis
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   const isDark = theme === "dark";
   document.getElementById("themeIcon").textContent = isDark ? "☀️" : "🌙";
   document.getElementById("themeLabel").textContent = isDark ? "Light" : "Dark";
+  
+  // Mengubah warna status bar atas HP secara otomatis
+  document.getElementById("metaThemeColor").content = isDark ? "#000000" : "#f2f2f7";
+  
   try { localStorage.setItem("syukurTheme", theme); } catch(e) {}
 }
+
 let currentTheme = "dark";
 try { currentTheme = localStorage.getItem("syukurTheme") || "dark"; } catch(e) {}
 applyTheme(currentTheme);
+
 document.getElementById("themeBtn").addEventListener("click", () => {
   currentTheme = currentTheme === "dark" ? "light" : "dark";
   applyTheme(currentTheme);
