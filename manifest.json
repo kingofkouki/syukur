@@ -2,7 +2,7 @@
   "name": "Syukur. - Jurnal Minimalis",
   "short_name": "Syukur.",
   "description": "Aplikasi jurnal minimalis untuk mencatat hal-hal kecil yang Anda syukuri setiap hari.",
-  "start_url": "./index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
